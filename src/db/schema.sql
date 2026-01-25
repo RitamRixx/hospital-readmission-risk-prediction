@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS raw_hospital_data (
+    id SERIAL PRIMARY KEY,
+    payload JSONB,
+    ingest_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
