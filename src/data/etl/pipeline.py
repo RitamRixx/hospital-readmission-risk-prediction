@@ -34,7 +34,6 @@ def run_pipeline(batch_size=1000):
 
         # load
         print("Loading into database...")
-        # success = load_data(raw_records)
         success = load_data(clean_records)        
         
         if success:
