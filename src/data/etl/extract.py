@@ -1,7 +1,7 @@
 import json
 import os
 import requests
-from typing import Dict,Any,List,Tuple
+from typing import Dict, Any, List, Tuple
 
 STATE_FILE = "data/etl_state/state.json"
 
@@ -13,33 +13,41 @@ def load_state() -> int:
     return 0
 
 def save_state(offset: int) -> None:
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
 
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+    
     with open(STATE_FILE, 'w') as f:
         json.dump({'last_offset': offset}, f, indent=2)
 
-def extract_data(api_url: str, batch_size: int = 100) -> Tuple[List[Dict], int]:
+def extract_data(api_url: str, batch_size: int = 1000) -> Tuple[List[Dict], int]:
     current_offset = load_state()
-
+    
     params = {
         'offset': current_offset,
         'limit': batch_size
     }
-
+    
     try:
-        response = requests.get(api_url, params=params, timeout=30)
+        response = requests.get(api_url, params=params, timeout=120)
         response.raise_for_status()
-
+        
         data = response.json()
-
-        records = data if isinstance(data, list) else []
-
-        if not records:
-            print("No new record found")
+        
+        if isinstance(data, dict):
+            records = data.get('data', [])
+            has_more = data.get('has_more', False)
+            returned_count = data.get('returned_records', len(records))
+            print(f"API Response: {returned_count} records | Has more: {has_more}")
         else:
-            print(f"Fetched {len(records)} records starting at {current_offset}")
-
+            records = data if isinstance(data, list) else []
+        
+        if not records:
+            print("No new records found")
+        else:
+            print(f"Fetched {len(records)} records starting at offset {current_offset}")
+        
         return records, current_offset
+        
     except requests.exceptions.RequestException as e:
         print(f"Error extracting data: {e}")
         raise e

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import List, Dict
 from sqlalchemy import text
-from db.engine import get_engine
+from src.db.engine import get_engine
 
 def load_data(records: List[Dict]) -> bool:
     if not records:
@@ -29,7 +29,7 @@ def load_data(records: List[Dict]) -> bool:
             
             conn.execute(query, values)
             
-            print(f"Successfully loaded {len(records)} records into raw_hospital_data (bulk insert)")
+            print(f"Successfully loaded {len(records)} records into raw_hospital_data")
             return True
             
     except Exception as e:

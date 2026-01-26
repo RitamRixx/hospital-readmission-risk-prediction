@@ -4,7 +4,7 @@ from typing import Dict,Any,List
 
 def transform_data(raw_records: List[Dict[str, Any]]) -> pd.DataFrame:
     if not raw_records:
-        print('no revords to transform')
+        print('no records to transform')
         return pd.DataFrame()
     
     df = pd.DataFrame(raw_records)
