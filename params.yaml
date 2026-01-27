@@ -1,0 +1,110 @@
+database:
+  view_name: hospital_data_flattened
+  connection_from_env: true
+
+data:
+  batch_size: 10000
+  offset: 0
+
+data_cleaning:
+  drop_column: ["encounter_id","patient_nbr","payer_code","medical_specialty","examide","citoglipton","weight","max_glu_serum","A1Cresult","diag_1", "diag_2","diag_3","number_outpatient","num_procedures","num_med_active","diag_2_group" ,"tolbutamide","tolazamide","diag_3_group","troglitazone","race", "insulin", "glimepiride", "metformin-rosiglitazone", "pioglitazone", "repaglinide", "glipizide-metformin", "glyburide","metformin-pioglitazone","acetohexamide","glimepiride-pioglitazone","rosiglitazone","acarbose","chlorpropamide","glipizide","miglitol","glyburide-metformin","nateglinide"]
+  handle_missing:
+    numeric: median
+    categorical: mode
+  remove_duplicates: true
+
+feature_engineering:
+  icd9_mapping:
+    ranges:
+      Diabetes: [250, 251]
+      Circulatory: [390, 460]
+      Respiratory: [460, 520]
+      Digestive: [520, 580]
+      Genitourinary: [580, 630]
+      Cancer: [140, 240]
+      Musculoskeletal: [710, 740]
+      Injury: [800, 1000]
+    default: "Other"
+    unknown: "Unknown"
+
+  diagnosis_columns: ["diag_1","diag_2","diag_3"]
+
+  age_mapping:
+    '[0-10)': 5
+    '[10-20)': 15
+    '[20-30)': 25
+    '[30-40)': 35
+    '[40-50)': 45
+    '[50-60)': 55
+    '[60-70)': 65
+    '[70-80)': 75
+    '[80-90)': 85
+    '[90-100)': 95
+
+  rare_category_grouping:
+    enabled: true
+    threshold: 0.01
+    columns: ["admission_type_id","discharge_disposition_id","admission_source_id"]
+    group_name: "Other"
+
+  insulin_mapping:
+    'No': 0
+    'Steady': 1
+    'Down': 2
+    'Up': 3
+  
+  medication_columns: ["metformin","repaglinide","nateglinide","chlorpropamide","glimepiride","acetohexamide","glipizide","glyburide","tolbutamide","pioglitazone","rosiglitazone","acarbose","miglitol","troglitazone","tolazamide","insulin","glyburide_metformin","glipizide_metformin","glimepiride_pioglitazone","metformin_rosiglitazone","metformin_pioglitazone"]
+
+  new_features:
+    total_visits:
+      type: sum
+      columns:
+        - number_outpatient
+        - number_emergency
+        - number_inpatient
+
+    num_med_changes:
+      type: count_values
+      columns: medication_columns
+      values:
+        - Up
+        - Down
+
+    num_med_active:
+      type: count_not_equal
+      columns: medication_columns
+      not_equal_to: "No"
+
+    interaction_visits_meds:
+      type: multiply
+      columns:
+        - total_visits
+        - num_med_active
+
+    insulin_coded:
+      type: map
+      column: insulin
+      mapping: insulin_mapping
+    
+  target:
+    column_name: readmitted_binary
+    source_column: readmitted
+    mapping:
+      '<30': 1
+      '>30': 0
+      'NO': 0
+
+data_split:
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+
+model_training: 
+
+
+  
+
+  
+
+
+

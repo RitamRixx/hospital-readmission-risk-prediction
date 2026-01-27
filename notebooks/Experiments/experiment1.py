@@ -18,7 +18,7 @@ mlflow.set_tracking_uri("https://dagshub.com/RitamRixx/hospital-readmission-risk
 
 
 
-df = pd.read_csv("notebooks/notebooksFile/data_final.csv")
+df = pd.read_csv("notebooks/dataset/data_final10ktest.csv")
 
 X = df.drop("readmitted", axis=1)
 y = df["readmitted"]
