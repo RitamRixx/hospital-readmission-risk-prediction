@@ -1,0 +1,12 @@
+{
+    "objective": "binary",
+    "is_unbalance": true,
+    "random_state": 42,
+    "n_estimators": 234,
+    "num_leaves": 48,
+    "max_depth": 3,
+    "learning_rate": 0.04643194339659498,
+    "min_child_samples": 36,
+    "subsample": 0.9620252385957394,
+    "colsample_bytree": 0.8802407967303383
+}

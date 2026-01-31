@@ -1,0 +1,6 @@
+[core]
+    remote = origin
+['remote "origin"']
+    url = https://dagshub.com/RitamRixx/hospital-readmission-risk-prediction.dvc
+    user = RitamRixx
+    password = 49a80cbb6f5399797484eb6caa3d3917f3e84231

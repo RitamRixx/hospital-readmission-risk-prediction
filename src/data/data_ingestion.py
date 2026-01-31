@@ -10,7 +10,7 @@ def load_params(config_path: str = "params.yaml") -> dict:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
     except Exception as e:
-        raise Exception(f"Errir loading file params.yaml") from e
+        raise Exception(f"Error loading file params.yaml") from e
     
 def ingest_data_postgres(output_path: str):
 
@@ -26,7 +26,7 @@ def ingest_data_postgres(output_path: str):
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    engin = get_engine()
+    engine = get_engine()
 
 
     query = text(f"""
@@ -37,7 +37,7 @@ def ingest_data_postgres(output_path: str):
 
 
     try:
-        with engin.connect() as conn:
+        with engine.connect() as conn:
             df = pd.read_sql(query, conn, params={"limit": batch_size})
 
             if df.empty:

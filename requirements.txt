@@ -111,9 +111,9 @@ matplotlib==3.10.8
 matplotlib-inline==0.2.1
 mdurl==0.1.2
 missingno==0.5.2
-mlflow==3.8.1
-mlflow-skinny==3.8.1
-mlflow-tracing==3.8.1
+mlflow==3.9.0
+mlflow-skinny==3.9.0
+mlflow-tracing==3.9.0
 multidict==6.7.0
 mypy_extensions==1.1.0
 narwhals==2.15.0
@@ -136,6 +136,7 @@ patsy==1.0.2
 pillow==12.1.0
 platformdirs==4.5.1
 plotly==6.5.2
+prettytable==3.17.0
 prompt_toolkit==3.0.52
 propcache==0.4.1
 protobuf==6.33.4
@@ -175,6 +176,7 @@ shellingham==1.5.4
 shortuuid==1.0.13
 shtab==1.8.0
 six==1.17.0
+skops==0.13.0
 smmap==5.0.2
 SQLAlchemy==2.0.45
 sqlparse==0.5.5

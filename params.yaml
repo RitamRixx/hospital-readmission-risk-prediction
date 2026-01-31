@@ -48,11 +48,11 @@ feature_engineering:
 
   insulin_mapping:
     'No': 0
-    'Steady': 1
-    'Down': 2
+    'Down': 1
+    'Steady': 2
     'Up': 3
   
-  medication_columns: ["metformin","repaglinide","nateglinide","chlorpropamide","glimepiride","acetohexamide","glipizide","glyburide","tolbutamide","pioglitazone","rosiglitazone","acarbose","miglitol","troglitazone","tolazamide","insulin","glyburide-metformin","glipizide-metformin","glimepiride-pioglitazone","metformin-rosiglitazone","metformin-pioglitazone"]
+  medication_columns: ["metformin","repaglinide","nateglinide","chlorpropamide","glimepiride","acetohexamide","glipizide","glyburide","tolbutamide","pioglitazone","rosiglitazone","acarbose","miglitol","troglitazone","tolazamide","insulin","glyburide_metformin","glipizide_metformin","glimepiride_pioglitazone","metformin_rosiglitazone","metformin_pioglitazone"]
 
   new_features:
     total_visits:
@@ -94,46 +94,57 @@ feature_engineering:
       'NO': 0
 
   feature_selection:
-    drop_column: ["encounter_id","patient_nbr","payer_code","medical_specialty","examide","citoglipton","weight","max_glu_serum","A1Cresult","diag_1", "diag_2","diag_3","number_outpatient","num_procedures","num_med_active","diag_2_group" ,"tolbutamide","tolazamide","diag_3_group","troglitazone","race", "insulin", "glimepiride", "metformin-rosiglitazone", "pioglitazone", "repaglinide", "glipizide-metformin", "glyburide","metformin-pioglitazone","acetohexamide","glimepiride-pioglitazone","rosiglitazone","acarbose","chlorpropamide","glipizide","miglitol","glyburide-metformin","nateglinide","readmitted"]
+    drop_column: ["id","ingest_at","encounter_id","patient_nbr","payer_code","medical_specialty","examide","citoglipton","weight","max_glu_serum","diag_1", "diag_2","diag_3","number_outpatient","num_procedures","num_med_active","diag_2_group" ,"tolbutamide","tolazamide","diag_3_group","troglitazone","race", "insulin", "glimepiride", "metformin_rosiglitazone", "pioglitazone", "repaglinide", "glipizide_metformin", "glyburide","metformin_pioglitazone","acetohexamide","glimepiride_pioglitazone","rosiglitazone","acarbose","chlorpropamide","glipizide","miglitol","glyburide_metformin","nateglinide","a1cresult"]
 
-  encoding:
-    num_cols: ["age", "time_in_hospital", "num_lab_procedures","num_medications","number_emergency","number_inpatient", "number_diagnoses","total_visits", "num_med_changes","insulin_coded", "interaction_visits_meds"]
-    label_encode_cols: ["gender", "diabetesMed", "metformin", "change", "diag_1_group"]
-    target_encode_cols: ["admission_type_id","discharge_disposition_id","admission_source_id"]
+encoding:
+  num_cols: ["age", "time_in_hospital", "num_lab_procedures","num_medications","number_emergency","number_inpatient", "number_diagnoses","total_visits", "num_med_changes","insulin_coded", "interaction_visits_meds"]
+  label_encode_cols: ["gender", "diabetesmed", "metformin", "change", "diag_1_group"]
+  target_encode_cols: ["admission_type_id","discharge_disposition_id","admission_source_id"]
 
 data_split:
   test_size: 0.2
   random_state: 42
-  stratify: true
 
-optuna:
-  n_trials: 50
-  timeout: 3600
-  metric: 'recall'
+# optuna:
+#   n_trials: 50
+#   timeout: 3600
+#   metric: 'recall'
 
-  search_space:
-    objective: 'binary'
-    is_unbalance: true
-    random_state: 42
-    n_estimators: [200,800]
-    num_leaves: [20,80]
-    max_depth: [3,15]
-    min_child_samples: [20,200]
-    learning_rate: [0.01,0.3]
-    subsample: [0.6,1.0]
-    colsample_bytree: [0.6,1.0]
-
+  # search_space:
+  #   objective: 'binary'
+  #   is_unbalance: true
+  #   random_state: 42
+  #   n_estimators: [200,800]
+  #   num_leaves: [20,80]
+  #   max_depth: [3,15]
+  #   min_child_samples: [20,200]
+  #   learning_rate: [0.01,0.3]
+  #   subsample: [0.6,1.0]
+  #   colsample_bytree: [0.6,1.0]
 
 model_training:
   model_type: "lightgbm"
-  optimal_threshold: 0.3
+  optimal_threshold: 0.62
+
+  lightgbm_params:
+    objective: "binary"
+    is_unbalance: true
+    random_state: 42
+    n_estimators: 234
+    num_leaves: 48
+    max_depth: 3
+    learning_rate: 0.04643194339659498
+    min_child_samples: 36
+    subsample: 0.9620252385957394
+    colsample_bytree: 0.8802407967303383
+    verbose: -1
 
 
 
 mlflow:
   tracking_uri: "https://dagshub.com/RitamRixx/hospital-readmission-risk-prediction.mlflow"
-  experiment_name: 'production-pipeline'
-  model_name: 'readmisson-risk-lightgbm'
+  experiment_name: 'production-pipeline-New'
+  model_name: 'readmission-risk-lightgbm'
   repo_owner: 'RitamRixx'
   repo_name: 'hospital-readmission-risk-prediction'
 
