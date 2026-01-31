@@ -1,5 +1,17 @@
 # Byte-compiled / optimized / DLL files
 myvenv
+src/model/optuna.py
+src/model/model_training.py
+/data/raw/raw.csv
+/data/interim/cleaned_data.csv
+/data/processed/featured_data.csv
+/data/final/train.csv
+/data/final/test.csv
+/models/model.pkl
+/models/label_encoders.pkl
+/models/target_encoder.pkl
+/models/feature_info.json
+/models/metrics/evaluation.json
 
 __pycache__/
 *.py[cod]

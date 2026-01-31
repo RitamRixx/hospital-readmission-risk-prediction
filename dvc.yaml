@@ -1,0 +1,60 @@
+stages:
+
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+      - src/data/data_ingestion.py
+      - src/db/engine.py
+    params:
+      - database
+      - data
+      - paths.raw_data
+    outs:
+      - data/raw/raw.csv
+
+  data_cleaning:
+    cmd: python -m src.data.data_cleaning
+    deps:
+      - src/data/data_cleaning.py
+      - data/raw/raw.csv
+    outs:
+      - data/interim/cleaned_data.csv
+
+  feature_engineering:
+    cmd: python -m src.features.feature_engineering
+    deps:
+      - src/features/feature_engineering.py
+      - data/interim/cleaned_data.csv
+    outs:
+      - data/processed/featured_data.csv
+      - models/feature_info.json
+
+  data_split:
+    cmd: python -m src.features.data_split
+    deps:
+      - src/features/data_split.py
+      - data/processed/featured_data.csv
+    outs:
+      - data/final/train.csv
+      - data/final/test.csv
+
+  training_eval:
+    cmd: python -m src.model.training_eval
+    deps:
+      - src/model/training_eval.py
+      - data/final/train.csv
+      - data/final/test.csv
+    outs:
+      - models/model.pkl
+      - models/label_encoders.pkl
+      - models/target_encoder.pkl
+      - models/metrics/evaluation.json
+
+  register_model:
+    cmd: python -m src.model.register_model
+    deps:
+      - src/model/register_model.py
+      - models/model.pkl
+      - models/metrics/evaluation.json
+    params:
+      - mlflow
