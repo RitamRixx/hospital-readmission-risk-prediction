@@ -4,10 +4,9 @@ database:
 
 data:
   batch_size: 10000
-  offset: 0
+  data_version: 1
 
 data_cleaning:
-  drop_column: ["encounter_id","patient_nbr","payer_code","medical_specialty","examide","citoglipton","weight","max_glu_serum","A1Cresult","diag_1", "diag_2","diag_3","number_outpatient","num_procedures","num_med_active","diag_2_group" ,"tolbutamide","tolazamide","diag_3_group","troglitazone","race", "insulin", "glimepiride", "metformin-rosiglitazone", "pioglitazone", "repaglinide", "glipizide-metformin", "glyburide","metformin-pioglitazone","acetohexamide","glimepiride-pioglitazone","rosiglitazone","acarbose","chlorpropamide","glipizide","miglitol","glyburide-metformin","nateglinide"]
   handle_missing:
     numeric: median
     categorical: mode
@@ -53,7 +52,7 @@ feature_engineering:
     'Down': 2
     'Up': 3
   
-  medication_columns: ["metformin","repaglinide","nateglinide","chlorpropamide","glimepiride","acetohexamide","glipizide","glyburide","tolbutamide","pioglitazone","rosiglitazone","acarbose","miglitol","troglitazone","tolazamide","insulin","glyburide_metformin","glipizide_metformin","glimepiride_pioglitazone","metformin_rosiglitazone","metformin_pioglitazone"]
+  medication_columns: ["metformin","repaglinide","nateglinide","chlorpropamide","glimepiride","acetohexamide","glipizide","glyburide","tolbutamide","pioglitazone","rosiglitazone","acarbose","miglitol","troglitazone","tolazamide","insulin","glyburide-metformin","glipizide-metformin","glimepiride-pioglitazone","metformin-rosiglitazone","metformin-pioglitazone"]
 
   new_features:
     total_visits:
@@ -85,7 +84,7 @@ feature_engineering:
       type: map
       column: insulin
       mapping: insulin_mapping
-    
+
   target:
     column_name: readmitted_binary
     source_column: readmitted
@@ -94,17 +93,59 @@ feature_engineering:
       '>30': 0
       'NO': 0
 
+  feature_selection:
+    drop_column: ["encounter_id","patient_nbr","payer_code","medical_specialty","examide","citoglipton","weight","max_glu_serum","A1Cresult","diag_1", "diag_2","diag_3","number_outpatient","num_procedures","num_med_active","diag_2_group" ,"tolbutamide","tolazamide","diag_3_group","troglitazone","race", "insulin", "glimepiride", "metformin-rosiglitazone", "pioglitazone", "repaglinide", "glipizide-metformin", "glyburide","metformin-pioglitazone","acetohexamide","glimepiride-pioglitazone","rosiglitazone","acarbose","chlorpropamide","glipizide","miglitol","glyburide-metformin","nateglinide","readmitted"]
+
+  encoding:
+    num_cols: ["age", "time_in_hospital", "num_lab_procedures","num_medications","number_emergency","number_inpatient", "number_diagnoses","total_visits", "num_med_changes","insulin_coded", "interaction_visits_meds"]
+    label_encode_cols: ["gender", "diabetesMed", "metformin", "change", "diag_1_group"]
+    target_encode_cols: ["admission_type_id","discharge_disposition_id","admission_source_id"]
+
 data_split:
   test_size: 0.2
   random_state: 42
   stratify: true
 
-model_training: 
+optuna:
+  n_trials: 50
+  timeout: 3600
+  metric: 'recall'
+
+  search_space:
+    objective: 'binary'
+    is_unbalance: true
+    random_state: 42
+    n_estimators: [200,800]
+    num_leaves: [20,80]
+    max_depth: [3,15]
+    min_child_samples: [20,200]
+    learning_rate: [0.01,0.3]
+    subsample: [0.6,1.0]
+    colsample_bytree: [0.6,1.0]
 
 
-  
+model_training:
+  model_type: "lightgbm"
+  optimal_threshold: 0.3
 
-  
 
 
+mlflow:
+  tracking_uri: "https://dagshub.com/RitamRixx/hospital-readmission-risk-prediction.mlflow"
+  experiment_name: 'production-pipeline'
+  model_name: 'readmisson-risk-lightgbm'
+  repo_owner: 'RitamRixx'
+  repo_name: 'hospital-readmission-risk-prediction'
 
+
+paths:
+  raw_data: data/raw/raw.csv
+  cleaned_data: data/interim/cleaned_data.csv
+  featured_data: data/processed/featured_data.csv
+  train_data: data/final/train.csv
+  test_data: data/final/test.csv
+  model_output: models/model.pkl
+  label_encoders: models/label_encoders.pkl
+  target_encoder: models/target_encoder.pkl
+  best_params: models/best_params.json
+  metrics_output: models/metrics/evaluation.json
