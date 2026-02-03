@@ -104,24 +104,6 @@ encoding:
 data_split:
   test_size: 0.2
   random_state: 42
-
-# optuna:
-#   n_trials: 50
-#   timeout: 3600
-#   metric: 'recall'
-
-  # search_space:
-  #   objective: 'binary'
-  #   is_unbalance: true
-  #   random_state: 42
-  #   n_estimators: [200,800]
-  #   num_leaves: [20,80]
-  #   max_depth: [3,15]
-  #   min_child_samples: [20,200]
-  #   learning_rate: [0.01,0.3]
-  #   subsample: [0.6,1.0]
-  #   colsample_bytree: [0.6,1.0]
-
 model_training:
   model_type: "lightgbm"
   optimal_threshold: 0.62

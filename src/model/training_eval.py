@@ -137,11 +137,6 @@ def train_model():
         os.makedirs(os.path.dirname(params["paths"]["metrics_output"]), exist_ok=True)
         with open(params["paths"]["metrics_output"], "w") as f:
             json.dump(eval_metrics, f, indent=4)
-
-        # ==============================================================
-        # THE REAL FIX: Don't use log_model, use log_artifact directly
-        # Save the model properly with MLflow format, then log as artifact
-        # ==============================================================
         
         print("\n" + "="*60)
         print("LOGGING MODEL")
