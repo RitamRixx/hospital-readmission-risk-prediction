@@ -8,7 +8,7 @@ from src.data.etl.load import load_data
 load_dotenv()
 
 
-def run_pipeline(batch_size=1000):
+def run_pipeline(batch_size=1000, replace_mode=False):
     api_url = os.getenv("API")
     if not api_url:
         print("Error: API URL not found in .env")
@@ -33,11 +33,13 @@ def run_pipeline(batch_size=1000):
         clean_records = df_transformed.to_dict(orient='records')
 
         # load
+        mode_text = "REPLACE mode" if replace_mode else "APPEND mode"
         print("Loading into database...")
-        success = load_data(clean_records)        
+        success = load_data(clean_records,replace_mode=replace_mode)      
         
         if success:
             new_offset = offset + len(raw_records)
+            save_state(new_offset)
             print(f"Batch Complete! New Offset Saved: {new_offset}")
             return True
         else:
@@ -48,7 +50,7 @@ def run_pipeline(batch_size=1000):
         print(f"Batch failed with error: {e}")
         return False
     
-def run_full_ingestion(total_records: int = 100000, batch_size: int = 1000):
+def run_full_ingestion(total_records: int = 100000, batch_size: int = 1000, replace_mode: bool = False):
     num_batches = total_records // batch_size
     
 
@@ -64,7 +66,7 @@ def run_full_ingestion(total_records: int = 100000, batch_size: int = 1000):
         print(f"Batch {i+1}/{num_batches}")
 
         
-        success = run_pipeline(batch_size)
+        success = run_pipeline(batch_size, replace_mode=replace_mode)
         
         if success:
             successful_batches += 1
@@ -87,9 +89,14 @@ if __name__ == "__main__":
         if sys.argv[1] == "--full":
             total = int(sys.argv[2]) if len(sys.argv) > 2 else 100000
             batch = int(sys.argv[3]) if len(sys.argv) > 3 else 1000
-            run_full_ingestion(total_records=total, batch_size=batch)
+            replace = "--replace" in sys.argv
+
+            run_full_ingestion(total_records=total, batch_size=batch, replace_mode=replace)
+        elif sys.argv[1] == "--replace":
+            batch_size = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
+            run_pipeline(batch_size=batch_size, replace_mode=True)
         else:
             batch_size = int(sys.argv[1])
             run_pipeline(batch_size=batch_size)
     else:
-        run_pipeline(batch_size=1000)
+        run_pipeline(batch_size=1000, replace_mode=False)

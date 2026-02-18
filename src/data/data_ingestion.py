@@ -17,12 +17,10 @@ def ingest_data_postgres(output_path: str):
     params = load_params()
 
     view_name = params["database"]["view_name"]
-    batch_size = params["data"]["batch_size"]
-
-
-    print("\nConfiguration:")
+    # batch_size = params["data"]["batch_size"]
+    # print("\nConfiguration:")
     print(f"View: {view_name}")
-    print(f"Batch size : {batch_size}")
+    # print(f"Batch size : {batch_size}")
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -35,10 +33,17 @@ def ingest_data_postgres(output_path: str):
         LIMIT :limit
     """)
 
+    # query = text(f"""
+    #     SELECT * FROM {view_name}
+    #     ORDER BY id
+    # """)
+
+
 
     try:
         with engine.connect() as conn:
-            df = pd.read_sql(query, conn, params={"limit": batch_size})
+            # df = pd.read_sql(query, conn, params={"limit": batch_size})
+            df = pd.read_sql(query, conn)
 
             if df.empty:
                 raise ValueError("No data returned")

@@ -138,9 +138,7 @@ def train_model():
         with open(params["paths"]["metrics_output"], "w") as f:
             json.dump(eval_metrics, f, indent=4)
         
-        print("\n" + "="*60)
         print("LOGGING MODEL")
-        print("="*60)
         
 
         
@@ -149,8 +147,6 @@ def train_model():
         model_save_path = os.path.join(temp_model_dir, "model")
         
         try:
-            # Save using mlflow's save_model (creates proper structure)
-            # But DON'T use log_model which seems to fail with DagsHub
             print("Saving model with MLflow format...")
             
             import warnings

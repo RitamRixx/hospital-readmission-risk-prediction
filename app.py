@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from typing import Annotated, Literal, Optional
-from pydantic import BaseModel, Field, validator
+from typing import Annotated, Literal
+from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np

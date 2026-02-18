@@ -6,6 +6,9 @@ data:
   batch_size: 10000
   data_version: 1
 
+# data:
+#   description: "Cumulative training - fetches all available data from database"
+
 data_cleaning:
   handle_missing:
     numeric: median

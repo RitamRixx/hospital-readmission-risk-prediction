@@ -4,4 +4,9 @@ CREATE TABLE IF NOT EXISTS raw_hospital_data (
     ingest_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+CREATE TABLE IF NOT EXISTS hospital_data_archive(
+    id SERIAL PRIMARY KEY,
+    payload JSONB,
+    ingest_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

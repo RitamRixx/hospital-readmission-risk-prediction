@@ -7,7 +7,7 @@ stages:
       - src/db/engine.py
     params:
       - database
-      - data
+      - data.data_version
       - paths.raw_data
     outs:
       - data/raw/raw.csv
