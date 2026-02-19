@@ -6,4 +6,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
     GRANT ALL PRIVILEGES ON DATABASE hospital_readmission TO $POSTGRES_USER;
 EOSQL
 
-echo "✓ Database 'hospital_readmission' created successfully"
+echo "Database 'hospital_readmission' created successfully"

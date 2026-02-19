@@ -6,8 +6,6 @@ data:
   batch_size: 10000
   data_version: 1
 
-# data:
-#   description: "Cumulative training - fetches all available data from database"
 
 data_cleaning:
   handle_missing:
@@ -137,6 +135,7 @@ mlflow:
 paths:
   raw_data: data/raw/raw.csv
   cleaned_data: data/interim/cleaned_data.csv
+  reference_data: data/reference/reference_data.csv
   featured_data: data/processed/featured_data.csv
   train_data: data/final/train.csv
   test_data: data/final/test.csv

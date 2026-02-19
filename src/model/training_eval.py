@@ -158,7 +158,7 @@ def train_model():
                     path=model_save_path
                 )
             
-            print(f"✓ Model saved to: {model_save_path}")
+            print(f"Model saved to: {model_save_path}")
             
             # List what was created
             print("Model directory contents:")
@@ -175,27 +175,24 @@ def train_model():
                     artifact_path = os.path.join("model", rel_path).replace("\\", "/")
                     
                     mlflow.log_artifact(file_path, artifact_path=os.path.dirname(artifact_path))
-                    print(f"  ✓ Uploaded: {artifact_path}")
+                    print(f"Uploaded: {artifact_path}")
             
-            print("✓ Model logged successfully")
+            print("Model logged successfully")
             
         finally:
             # Cleanup
             if os.path.exists(temp_model_dir):
                 shutil.rmtree(temp_model_dir)
         
-        print("="*60 + "\n")
-
         # Log other artifacts
         mlflow.log_artifact(__file__)
         mlflow.log_artifact(params["paths"]["label_encoders"], artifact_path="encoders")
         mlflow.log_artifact(params["paths"]["target_encoder"], artifact_path="encoders")
-        print("✓ Other artifacts logged\n")
+        print("Other artifacts logged\n")
 
         # Final verification
-        print("="*60)
         print("FINAL VERIFICATION")
-        print("="*60)
+
         
         from mlflow.tracking import MlflowClient
         client = MlflowClient()
@@ -209,14 +206,14 @@ def train_model():
         
         print("Artifacts in run:")
         for artifact in artifacts:
-            icon = "📁" if artifact.is_dir else "📄"
+            icon = "Dir" if artifact.is_dir else "file"
             print(f"  {icon} {artifact.path}")
             
             if artifact.is_dir:
                 try:
                     sub_artifacts = client.list_artifacts(run_id, artifact.path)
                     for sub in sub_artifacts:
-                        print(f"    📄 {sub.path}")
+                        print(f"{sub.path}")
                 except:
                     pass
         
@@ -233,6 +230,12 @@ def train_model():
         print(f"ROC-AUC:   {roc_auc:.4f}")
         print(f"\nRun ID: {run_id}")
         print("="*60)
+
+        cleaned_data_path = params["paths"]["cleaned_data"]
+        reference_path = params["paths"]["reference_data"]
+        os.makedirs(os.path.dirname(reference_path), exist_ok=True)
+        shutil.copy(cleaned_data_path, reference_path)
+        print(f"\nReference data saved: {reference_path}")
 
 
 def main():

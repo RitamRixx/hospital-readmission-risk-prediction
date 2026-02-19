@@ -114,6 +114,8 @@ def register_latest_model():
         print(f"Model {model_name} v{registered_model.version} promoted to Production")
 
 
+
+
 def main():
     try:
         register_latest_model()
