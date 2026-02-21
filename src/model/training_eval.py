@@ -125,17 +125,17 @@ def train_model():
         # Save artifacts locally
         os.makedirs(os.path.dirname(params["paths"]["model_output"]), exist_ok=True)
         
-        with open(params["paths"]["model_output"], "wb") as f:
+        with open(params["paths"]["model_candidate"], "wb") as f:
             pickle.dump(model, f)
 
-        with open(params["paths"]["label_encoders"], "wb") as f:
+        with open(params["paths"]["candidate_label_encoders"], "wb") as f:
             pickle.dump(label_encoders, f)
 
-        with open(params["paths"]["target_encoder"], "wb") as f:
+        with open(params["paths"]["candidate_target_encoder"], "wb") as f:
             pickle.dump(target_encoder, f)
 
-        os.makedirs(os.path.dirname(params["paths"]["metrics_output"]), exist_ok=True)
-        with open(params["paths"]["metrics_output"], "w") as f:
+        os.makedirs(os.path.dirname(params["paths"]["candidate_metrics"]), exist_ok=True)
+        with open(params["paths"]["candidate_metrics"], "w") as f:
             json.dump(eval_metrics, f, indent=4)
         
         print("LOGGING MODEL")
@@ -231,11 +231,11 @@ def train_model():
         print(f"\nRun ID: {run_id}")
         print("="*60)
 
-        cleaned_data_path = params["paths"]["cleaned_data"]
-        reference_path = params["paths"]["reference_data"]
-        os.makedirs(os.path.dirname(reference_path), exist_ok=True)
-        shutil.copy(cleaned_data_path, reference_path)
-        print(f"\nReference data saved: {reference_path}")
+        # featured_data_path = params["paths"]["featured_data"]
+        # reference_path = params["paths"]["reference_data"]
+        # os.makedirs(os.path.dirname(reference_path), exist_ok=True)
+        # shutil.copy(featured_data_path, reference_path)
+        # print(f"\nReference data saved: {reference_path}")
 
 
 def main():

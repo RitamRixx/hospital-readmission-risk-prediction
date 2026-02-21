@@ -2,6 +2,8 @@ import yaml
 import mlflow
 import dagshub
 from mlflow.tracking import MlflowClient
+import os
+import json
 
 def load_params():
     try:
@@ -13,6 +15,21 @@ def load_params():
 def register_latest_model():
     params = load_params()
     mlflow_params = params['mlflow']
+
+    deployment_decision_path = "models/deployment_decision.json"
+    if not os.path.exists(deployment_decision_path):
+        print("No deployment decision file found. Skipping model registration.")
+        return
+    
+    with open(deployment_decision_path, "r") as f:
+        decision = json.load(f)
+
+    if not decision.get("deploy", False):
+        print("Deployment decision is False. Skipping model registration.")
+        return
+    
+    print("Model approved for deployment - proceeding with registration")
+    
 
     dagshub.init(
         repo_owner=mlflow_params['repo_owner'],

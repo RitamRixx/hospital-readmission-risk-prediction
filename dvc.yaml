@@ -29,6 +29,21 @@ stages:
       - data/processed/featured_data.csv
       - models/feature_info.json
 
+  drift_check:
+    cmd: python -m src.monitoring.data_drift
+    deps:
+      - src/monitoring/data_drift.py
+      - data/processed/featured_data.csv
+      - data/reference/reference_data.csv
+    params:
+      - drift_monitoring
+      - paths.featured_data
+      - paths.reference_data
+    outs:
+      - models/drift_decision.json
+      - models/drift_report:
+          cache: false
+
   data_split:
     cmd: python -m src.features.data_split
     deps:
@@ -45,10 +60,23 @@ stages:
       - data/final/train.csv
       - data/final/test.csv
     outs:
-      - models/model.pkl
-      - models/label_encoders.pkl
-      - models/target_encoder.pkl
-      - models/metrics/evaluation.json
+      - models/model_candidate.pkl
+      - models/candidate_label_encoders.pkl
+      - models/candidate_target_encoder.pkl
+      - models/metrics/candidate_evaluation.json
+
+  model_compare:
+    cmd: python -m src.model.model_compare
+    deps:
+      - src/model/model_compare.py
+      - models/model_candidate.pkl
+      - data/final/test.csv
+    params:
+      - model_comparison
+      - encoding
+      - feature_engineering.target
+    outs:
+      - models/deployment_decision.json
 
   register_model:
     cmd: python -m src.model.register_model

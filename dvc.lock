@@ -5,17 +5,15 @@ stages:
     deps:
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: dbb083560e3bd624650c9f194b1318e9
-      size: 1492
+      md5: 568286c97e10bbfe0a97d2f7dddb3b5a
+      size: 1317
     - path: src/db/engine.py
       hash: md5
       md5: a803a50473ceb1275c58d60cf8a83cfa
       size: 438
     params:
       params.yaml:
-        data:
-          batch_size: 10000
-          data_version: 1
+        data.data_version: 1
         database:
           view_name: hospital_data_flattened
           connection_from_env: true
@@ -23,15 +21,15 @@ stages:
     outs:
     - path: data/raw/raw.csv
       hash: md5
-      md5: a81ba056976d77393ec581c03abb8937
-      size: 2111205
+      md5: 43b4a658d1319a9da495fa5a3730aec1
+      size: 2115634
   data_cleaning:
     cmd: python -m src.data.data_cleaning
     deps:
     - path: data/raw/raw.csv
       hash: md5
-      md5: a81ba056976d77393ec581c03abb8937
-      size: 2111205
+      md5: 43b4a658d1319a9da495fa5a3730aec1
+      size: 2115634
     - path: src/data/data_cleaning.py
       hash: md5
       md5: 8bde49a681003bddabca0a55a79187da
@@ -39,24 +37,24 @@ stages:
     outs:
     - path: data/interim/cleaned_data.csv
       hash: md5
-      md5: a81ba056976d77393ec581c03abb8937
-      size: 2111205
+      md5: 43b4a658d1319a9da495fa5a3730aec1
+      size: 2115634
   feature_engineering:
     cmd: python -m src.features.feature_engineering
     deps:
     - path: data/interim/cleaned_data.csv
       hash: md5
-      md5: a81ba056976d77393ec581c03abb8937
-      size: 2111205
+      md5: 43b4a658d1319a9da495fa5a3730aec1
+      size: 2115634
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: ea1bbd194e0675b8ddda7501169e06fb
-      size: 9727
+      md5: 55b22a85ae794cc267b7b158ccb2ad55
+      size: 4311
     outs:
     - path: data/processed/featured_data.csv
       hash: md5
-      md5: a0150832cbf82ff69410e324a2a2929d
-      size: 622278
+      md5: 89086eae43ce86ca571fd85a8c288d4a
+      size: 622445
     - path: models/feature_info.json
       hash: md5
       md5: 382edaea61f88438fb8d0649436778a8
@@ -66,53 +64,53 @@ stages:
     deps:
     - path: data/processed/featured_data.csv
       hash: md5
-      md5: a0150832cbf82ff69410e324a2a2929d
-      size: 622278
+      md5: 89086eae43ce86ca571fd85a8c288d4a
+      size: 622445
     - path: src/features/data_split.py
       hash: md5
-      md5: e04dfdeea73e0fccce6219f60c427b17
-      size: 6570
+      md5: c021be792c0494d9ee32a98fa8d0a630
+      size: 2049
     outs:
     - path: data/final/test.csv
       hash: md5
-      md5: 1f1e4e1eb15e9022233a13134fea7320
-      size: 121789
+      md5: 2ac92cf9fe5ca4b95cd4e32b0f9b0727
+      size: 121654
     - path: data/final/train.csv
       hash: md5
-      md5: 10e5e0b8773c1041416138612ee5b14d
-      size: 485681
+      md5: 2e0b36ca56fe77dbe1a6d970df046ee5
+      size: 486171
   training_eval:
     cmd: python -m src.model.training_eval
     deps:
     - path: data/final/test.csv
       hash: md5
-      md5: 1f1e4e1eb15e9022233a13134fea7320
-      size: 121789
+      md5: 2ac92cf9fe5ca4b95cd4e32b0f9b0727
+      size: 121654
     - path: data/final/train.csv
       hash: md5
-      md5: 10e5e0b8773c1041416138612ee5b14d
-      size: 485681
+      md5: 2e0b36ca56fe77dbe1a6d970df046ee5
+      size: 486171
     - path: src/model/training_eval.py
       hash: md5
-      md5: 16e89b9bdff9fabe76388676f0ef9c6c
-      size: 8601
+      md5: 1515cd1255f7cfa9bd9a4bb6c93ab19d
+      size: 8351
     outs:
-    - path: models/label_encoders.pkl
+    - path: models/candidate_label_encoders.pkl
       hash: md5
       md5: b238265b15871859fa489e502ce946f2
       size: 678
-    - path: models/metrics/evaluation.json
+    - path: models/candidate_target_encoder.pkl
       hash: md5
-      md5: bda226ec67b4b420ad9c6994d4349698
-      size: 173
-    - path: models/model.pkl
+      md5: 82e90dbfc9de9e2e115e25b02340ca01
+      size: 3672
+    - path: models/metrics/candidate_evaluation.json
       hash: md5
-      md5: 663e1670167554afb7f01121cab26b9e
-      size: 213186
-    - path: models/target_encoder.pkl
+      md5: 90bd61f9b5a8993b951d386e129caff7
+      size: 175
+    - path: models/model_candidate.pkl
       hash: md5
-      md5: 64674a08fcf189dbb001a2ac9d8a16aa
-      size: 3581
+      md5: a9bfbd84eec8e41f3a740e0f976123ea
+      size: 215243
   register_model:
     cmd: python -m src.model.register_model
     deps:
@@ -122,12 +120,12 @@ stages:
       size: 173
     - path: models/model.pkl
       hash: md5
-      md5: 663e1670167554afb7f01121cab26b9e
-      size: 213186
+      md5: a9bfbd84eec8e41f3a740e0f976123ea
+      size: 215243
     - path: src/model/register_model.py
       hash: md5
-      md5: 6fdcfd45039e73d7c41d97bc635c8235
-      size: 11976
+      md5: 316636e78bdd8aa0e611d768113dfaaa
+      size: 4589
     params:
       params.yaml:
         mlflow:
@@ -137,3 +135,92 @@ stages:
           model_name: readmission-risk-lightgbm
           repo_owner: RitamRixx
           repo_name: hospital-readmission-risk-prediction
+  drift_check:
+    cmd: python -m src.monitoring.data_drift
+    deps:
+    - path: data/processed/featured_data.csv
+      hash: md5
+      md5: 89086eae43ce86ca571fd85a8c288d4a
+      size: 622445
+    - path: data/reference/reference_data.csv
+      hash: md5
+      md5: 89086eae43ce86ca571fd85a8c288d4a
+      size: 622445
+    - path: src/monitoring/data_drift.py
+      hash: md5
+      md5: ab7b8204c5b16e1e826e8d17e568bc2e
+      size: 6973
+    params:
+      params.yaml:
+        drift_monitoring:
+          thresholds:
+            drift_share: 0.2
+            psi_threshold: 0.1
+        paths.featured_data: data/processed/featured_data.csv
+        paths.reference_data: data/reference/reference_data.csv
+    outs:
+    - path: models/drift_decision.json
+      hash: md5
+      md5: d772f9f364ea6ec61e9f41a92bafa49d
+      size: 367
+    - path: models/drift_report
+      hash: md5
+      md5: d99b04d078d20e1db22786569a461c0b.dir
+      size: 3410339
+      nfiles: 1
+  model_compare:
+    cmd: python -m src.model.model_compare
+    deps:
+    - path: data/final/test.csv
+      hash: md5
+      md5: 2ac92cf9fe5ca4b95cd4e32b0f9b0727
+      size: 121654
+    - path: models/model_candidate.pkl
+      hash: md5
+      md5: a9bfbd84eec8e41f3a740e0f976123ea
+      size: 215243
+    - path: src/model/model_compare.py
+      hash: md5
+      md5: 7f23131b5de18f86ae6ef753bb792d8a
+      size: 5877
+    params:
+      params.yaml:
+        encoding:
+          num_cols:
+          - age
+          - time_in_hospital
+          - num_lab_procedures
+          - num_medications
+          - number_emergency
+          - number_inpatient
+          - number_diagnoses
+          - total_visits
+          - num_med_changes
+          - insulin_coded
+          - interaction_visits_meds
+          label_encode_cols:
+          - gender
+          - diabetesmed
+          - metformin
+          - change
+          - diag_1_group
+          target_encode_cols:
+          - admission_type_id
+          - discharge_disposition_id
+          - admission_source_id
+        feature_engineering.target:
+          column_name: readmitted_binary
+          source_column: readmitted
+          mapping:
+            <30: 1
+            '>30': 0
+            NO: 0
+        model_comparison:
+          primary_metric: f1
+          min_improvement: 0.01
+          threshold: 0.62
+    outs:
+    - path: models/deployment_decision.json
+      hash: md5
+      md5: 77bc6565908d3d1119750322f5e4a17d
+      size: 393

@@ -2,3 +2,8 @@
 /model.pkl
 /label_encoders.pkl
 /target_encoder.pkl
+/drift_decision.json
+/model_candidate.pkl
+/candidate_label_encoders.pkl
+/candidate_target_encoder.pkl
+/deployment_decision.json

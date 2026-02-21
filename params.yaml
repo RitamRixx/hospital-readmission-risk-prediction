@@ -122,6 +122,16 @@ model_training:
     colsample_bytree: 0.8802407967303383
     verbose: -1
 
+drift_monitoring:
+  thresholds:
+    drift_share: 0.2
+    psi_threshold: 0.1
+
+model_comparison:
+  primary_metric: "f1"
+  min_improvement: 0.01
+  threshold: 0.62
+
 
 
 mlflow:
@@ -135,12 +145,20 @@ mlflow:
 paths:
   raw_data: data/raw/raw.csv
   cleaned_data: data/interim/cleaned_data.csv
-  reference_data: data/reference/reference_data.csv
   featured_data: data/processed/featured_data.csv
+  reference_data: data/reference/reference_data.csv
   train_data: data/final/train.csv
   test_data: data/final/test.csv
+
   model_output: models/model.pkl
   label_encoders: models/label_encoders.pkl
   target_encoder: models/target_encoder.pkl
-  best_params: models/best_params.json
   metrics_output: models/metrics/evaluation.json
+
+  model_candidate: models/model_candidate.pkl
+  candidate_label_encoders: models/candidate_label_encoders.pkl
+  candidate_target_encoder: models/candidate_target_encoder.pkl
+  candidate_metrics: models/metrics/candidate_evaluation.json
+  
+  best_params: models/best_params.json
+

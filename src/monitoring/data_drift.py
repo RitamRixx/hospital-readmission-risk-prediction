@@ -17,7 +17,7 @@ def load_params(config_path: str = "params.yaml") -> dict:
 def detect_data_drift():
     params = load_params()
     reference_path = params["paths"]["reference_data"]
-    current_path = params["paths"]["cleaned_data"]
+    current_path = params["paths"]["featured_data"]
 
 
     drift_decision_path = "models/drift_decision.json"
@@ -117,7 +117,13 @@ def detect_data_drift():
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         html_report_path = os.path.join(drift_report_dir, f"drift_report_{timestamp}.html")
+        # report.save(html_report_path)
+        # with open(html_report_path, "w", encoding="utf-8") as f:
+        #     f.write(report.get_html())
         report.save_html(html_report_path)
+        # html_content = report._repr_html_()
+        # with open(html_report_path, "w", encoding="utf-8") as f:
+        #     f.write(html_content)
         print(f"HTML report saved: {html_report_path}")
 
 
