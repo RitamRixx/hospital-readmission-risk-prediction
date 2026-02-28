@@ -107,20 +107,21 @@ data_split:
   random_state: 42
 model_training:
   model_type: "lightgbm"
-  optimal_threshold: 0.62
+  optimal_threshold: 0.40
 
   lightgbm_params:
     objective: "binary"
-    is_unbalance: true
+    scale_pos_weight: "balanced_auto"
     random_state: 42
-    n_estimators: 234
-    num_leaves: 48
+    n_estimators: 100
+    num_leaves: 26
     max_depth: 3
-    learning_rate: 0.04643194339659498
-    min_child_samples: 36
-    subsample: 0.9620252385957394
-    colsample_bytree: 0.8802407967303383
-    verbose: -1
+    learning_rate: 0.018992699499623924
+    min_child_samples: 19
+    subsample: 0.9012577567559076
+    colsample_bytree: 0.7492862130896354
+    reg_alpha: 0.13547692527518237
+    reg_lambda: 0.4380488099725967
 
 drift_monitoring:
   thresholds:
@@ -128,9 +129,9 @@ drift_monitoring:
     psi_threshold: 0.1
 
 model_comparison:
-  primary_metric: "f1"
+  primary_metric: "roc_auc"
   min_improvement: 0.01
-  threshold: 0.62
+  threshold: 0.40
 
 
 

@@ -81,11 +81,17 @@ def train_model():
 
         model_params = params["model_training"]
 
-        # Train model
-        model = lgb.LGBMClassifier(**model_params["lightgbm_params"])
+        lgbm_params = model_params["lightgbm_params"].copy()
+
+        if lgbm_params.get("scale_pos_weight") == "balanced_auto":
+            n_neg = (y_train == 0).sum()
+            n_pos = (y_train == 1).sum()
+            lgbm_params["scale_pos_weight"] = n_neg / n_pos
+
+        # model = lgb.LGBMClassifier(**model_params["lightgbm_params"])
+        model = lgb.LGBMClassifier(**lgbm_params)
         model.fit(X_train, y_train)
 
-        # Predictions
         y_prob = model.predict_proba(X_test)[:, 1]
         y_pred = (y_prob >= threshold).astype(int)
 

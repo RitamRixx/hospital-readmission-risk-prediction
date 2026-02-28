@@ -92,8 +92,8 @@ stages:
       size: 486171
     - path: src/model/training_eval.py
       hash: md5
-      md5: 1515cd1255f7cfa9bd9a4bb6c93ab19d
-      size: 8351
+      md5: 8f2028b55dbb88544d1893e8b037b8bf
+      size: 8637
     outs:
     - path: models/candidate_label_encoders.pkl
       hash: md5
@@ -105,12 +105,12 @@ stages:
       size: 3672
     - path: models/metrics/candidate_evaluation.json
       hash: md5
-      md5: 90bd61f9b5a8993b951d386e129caff7
-      size: 175
+      md5: fc3d6f73b3122c3595372e001a4b8be2
+      size: 174
     - path: models/model_candidate.pkl
       hash: md5
-      md5: a9bfbd84eec8e41f3a740e0f976123ea
-      size: 215243
+      md5: 201b758a71ffe4736415839a77700ad9
+      size: 96377
   register_model:
     cmd: python -m src.model.register_model
     deps:
@@ -120,8 +120,8 @@ stages:
       size: 173
     - path: models/model.pkl
       hash: md5
-      md5: a9bfbd84eec8e41f3a740e0f976123ea
-      size: 215243
+      md5: 201b758a71ffe4736415839a77700ad9
+      size: 96377
     - path: src/model/register_model.py
       hash: md5
       md5: 316636e78bdd8aa0e611d768113dfaaa
@@ -161,11 +161,11 @@ stages:
     outs:
     - path: models/drift_decision.json
       hash: md5
-      md5: d772f9f364ea6ec61e9f41a92bafa49d
+      md5: c7077db3e44e512d62275d26130f9622
       size: 367
     - path: models/drift_report
       hash: md5
-      md5: d99b04d078d20e1db22786569a461c0b.dir
+      md5: b4147b6a2b2c3e71358924708f58949e.dir
       size: 3410339
       nfiles: 1
   model_compare:
@@ -177,8 +177,8 @@ stages:
       size: 121654
     - path: models/model_candidate.pkl
       hash: md5
-      md5: a9bfbd84eec8e41f3a740e0f976123ea
-      size: 215243
+      md5: 201b758a71ffe4736415839a77700ad9
+      size: 96377
     - path: src/model/model_compare.py
       hash: md5
       md5: 7f23131b5de18f86ae6ef753bb792d8a
@@ -216,11 +216,11 @@ stages:
             '>30': 0
             NO: 0
         model_comparison:
-          primary_metric: f1
+          primary_metric: roc_auc
           min_improvement: 0.01
-          threshold: 0.62
+          threshold: 0.4
     outs:
     - path: models/deployment_decision.json
       hash: md5
-      md5: 77bc6565908d3d1119750322f5e4a17d
-      size: 393
+      md5: 48ad34a1dcea1d35941933ba696c37bb
+      size: 403

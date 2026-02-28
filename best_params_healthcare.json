@@ -1,0 +1,14 @@
+{
+    "objective": "binary",
+    "scale_pos_weight": 8.111617312072893,
+    "random_state": 42,
+    "n_estimators": 100,
+    "num_leaves": 26,
+    "max_depth": 3,
+    "learning_rate": 0.018992699499623924,
+    "min_child_samples": 19,
+    "subsample": 0.9012577567559076,
+    "colsample_bytree": 0.7492862130896354,
+    "reg_alpha": 0.13547692527518237,
+    "reg_lambda": 0.4380488099725967
+}

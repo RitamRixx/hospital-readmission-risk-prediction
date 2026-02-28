@@ -61,7 +61,6 @@ def encode_data(X_train, X_test, y_train):
         le = LabelEncoder()
         X_train[col] = le.fit_transform(X_train[col].astype(str))
         
-        # Handle unseen categories
         X_test[col] = X_test[col].astype(str).apply(
             lambda x: x if x in le.classes_ else le.classes_[0]
         )
@@ -90,7 +89,7 @@ def objective(trial):
     
     params = {
         "objective": "binary",
-        "class_weight": "balanced",  # Changed from is_unbalance
+        "class_weight": "balanced",
         "n_estimators": trial.suggest_int("n_estimators", 100, 500),
         "num_leaves": trial.suggest_int("num_leaves", 20, 80),
         "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2),
@@ -110,18 +109,15 @@ def objective(trial):
     precision = precision_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
 
-    # Log all metrics for this trial
     mlflow.log_metric("trial_recall", recall)
     mlflow.log_metric("trial_precision", precision)
     mlflow.log_metric("trial_f1", f1)
 
-    # Optimize F1 instead of just recall for better balance
     return f1
 
 
 with mlflow.start_run(run_name="exp5_optuna_search_fixed"):
 
-    # Create study - optimize F1 for balanced results
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=n_trials)
 
@@ -132,7 +128,6 @@ with mlflow.start_run(run_name="exp5_optuna_search_fixed"):
         **study.best_params
     }
 
-    # Train final model with best params
     print("\n" + "="*60)
     print("TRAINING FINAL MODEL WITH BEST PARAMS")
     print("="*60)
@@ -140,20 +135,17 @@ with mlflow.start_run(run_name="exp5_optuna_search_fixed"):
     final_model = LGBMClassifier(**best_params)
     final_model.fit(X_train, y_train)
 
-    # Use 0.5 as default threshold
     threshold = 0.5
 
     y_prob = final_model.predict_proba(X_test)[:, 1]
     y_pred = (y_prob >= threshold).astype(int)
 
-    # Calculate all metrics
     recall = recall_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
     roc_auc = roc_auc_score(y_test, y_prob)
     f1 = f1_score(y_test, y_pred)
     cm = confusion_matrix(y_test, y_pred)
 
-    # Log to MLflow
     mlflow.log_params(best_params)
     mlflow.log_metric("final_recall", recall)
     mlflow.log_metric("final_precision", precision)
@@ -161,15 +153,13 @@ with mlflow.start_run(run_name="exp5_optuna_search_fixed"):
     mlflow.log_metric("final_roc_auc", roc_auc)
     mlflow.log_metric("threshold", threshold)
 
-    mlflow.lightgbm.log_model(final_model, "model")
+    mlflow.lightgbm.log_model(final_model, name="model")
 
-    # Save best params
     with open("best_params_exp5.json", "w") as f:
         json.dump(best_params, f, indent=4)
 
     mlflow.log_artifact("best_params_exp5.json")
 
-    # Print results
     print("\nBest Hyperparameters:")
     print(json.dumps(best_params, indent=2))
     print(f"\nConfusion Matrix:")
@@ -179,4 +169,3 @@ with mlflow.start_run(run_name="exp5_optuna_search_fixed"):
     print(f"Precision: {precision:.4f}")
     print(f"F1-Score:  {f1:.4f}")
     print(f"ROC-AUC:   {roc_auc:.4f}")
-    print("="*60)
