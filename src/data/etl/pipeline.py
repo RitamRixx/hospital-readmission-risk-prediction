@@ -52,7 +52,6 @@ def run_pipeline(batch_size=1000, replace_mode=False):
     
 def run_full_ingestion(total_records: int = 100000, batch_size: int = 1000, replace_mode: bool = False):
     num_batches = total_records // batch_size
-    
 
     print(f"Hospital Readmission ETL Pipeline - FULL INGESTION")
     print(f"Total records: {total_records} | Batch size: {batch_size}")
@@ -64,10 +63,9 @@ def run_full_ingestion(total_records: int = 100000, batch_size: int = 1000, repl
     
     for i in range(num_batches):
         print(f"Batch {i+1}/{num_batches}")
+        current_replace = replace_mode if i == 0 else False
+        success = run_pipeline(batch_size, replace_mode=current_replace)
 
-        
-        success = run_pipeline(batch_size, replace_mode=replace_mode)
-        
         if success:
             successful_batches += 1
         else:

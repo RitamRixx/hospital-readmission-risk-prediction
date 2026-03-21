@@ -1,6 +1,37 @@
 version: '3.8'
 
+# Shared Airflow config — applied to all Airflow services
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.9.1
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    PYTHONPATH: /opt/airflow/project
+  env_file:
+    - .env
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - .:/opt/airflow/project
+    - airflow-logs:/opt/airflow/logs
+    - ./models:/opt/airflow/project/models
+  depends_on:
+    airflow-postgres:
+      condition: service_healthy
+  user: "${AIRFLOW_UID:-50000}:0"
+
 services:
+
+  
+  # YOUR APP STACK
+
+
+  # Hospital patient data — PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: hospital_db
@@ -18,6 +49,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # DB admin UI — http://localhost:8080
   adminer:
     image: adminer
     container_name: hospital_adminer
@@ -27,6 +59,7 @@ services:
     depends_on:
       - db
 
+  # Prediction FastAPI — http://localhost:8000
   api:
     build:
       context: .
@@ -44,5 +77,130 @@ services:
       db:
         condition: service_healthy
 
+  # AIRFLOW STACK
+
+  # Airflow's own metadata DB — separate from hospital_db
+  airflow-postgres:
+    image: postgres:15-alpine
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # One-time init — creates Airflow DB tables and admin user
+  # After first run this exits with code 0 — that is normal
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        pip install --quiet --no-cache-dir \
+          lightgbm==4.6.0 \
+          scikit-learn==1.7.2 \
+          pandas==2.3.3 \
+          numpy==2.0.2 \
+          category-encoders==2.8.1 \
+          PyYAML==6.0.3 \
+          mlflow==3.9.0 \
+          dagshub==0.6.4 \
+          evidently==0.6.7 \
+          psycopg2-binary==2.9.11 \
+          python-dotenv==1.2.1 \
+          dvc==3.66.1 && \
+        airflow db migrate && \
+        airflow users create \
+          --username admin \
+          --firstname Admin \
+          --lastname User \
+          --role Admin \
+          --email admin@hospital.com \
+          --password admin
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+    restart: on-failure
+
+  # Airflow scheduler — watches DAGs and triggers tasks
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow_scheduler
+    command:
+      - bash
+      - -c
+      - |
+        pip install --quiet --no-cache-dir \
+          lightgbm==4.6.0 \
+          scikit-learn==1.7.2 \
+          pandas==2.3.3 \
+          numpy==2.0.2 \
+          category-encoders==2.8.1 \
+          PyYAML==6.0.3 \
+          mlflow==3.9.0 \
+          dagshub==0.6.4 \
+          evidently==0.6.7 \
+          psycopg2-binary==2.9.11 \
+          python-dotenv==1.2.1 \
+          dvc==3.66.1 && \
+        airflow scheduler
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob", "--hostname", "$${HOSTNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Airflow webserver — UI at http://localhost:8081
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow_webserver
+    command:
+      - bash
+      - -c
+      - |
+        pip install --quiet --no-cache-dir \
+          lightgbm==4.6.0 \
+          scikit-learn==1.7.2 \
+          pandas==2.3.3 \
+          numpy==2.0.2 \
+          category-encoders==2.8.1 \
+          PyYAML==6.0.3 \
+          mlflow==3.9.0 \
+          dagshub==0.6.4 \
+          evidently==0.6.7 \
+          psycopg2-binary==2.9.11 \
+          python-dotenv==1.2.1 \
+          dvc==3.66.1 && \
+        airflow webserver
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:
+  airflow-postgres-data:
+  airflow-logs:
