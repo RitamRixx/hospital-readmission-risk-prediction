@@ -407,6 +407,47 @@ Airflow UI: **http://localhost:8081** (admin / admin)
 
 ---
 
+## Deployment
+ 
+The FastAPI prediction service is deployed on **GCP Cloud Run** and is publicly accessible.
+ 
+| | |
+|---|---|
+| **Live URL** | https://prediction-api-1055616729020.us-central1.run.app |
+| **Region** | us-central1 |
+| **Scaling** | Auto (Min: 0, Max: 10 instances) |
+| **Container Registry** | GCP Artifact Registry |
+ 
+### How it was deployed
+ 
+**1. Build and push the Docker image to Artifact Registry**
+ 
+```bash
+# Configure Docker to authenticate with GCP
+gcloud auth configure-docker us-central1-docker.pkg.dev
+ 
+# Build and tag the image
+docker build -t us-central1-docker.pkg.dev/<PROJECT_ID>/hospital-repo/prediction-api:latest .
+ 
+# Push to Artifact Registry
+docker push us-central1-docker.pkg.dev/<PROJECT_ID>/hospital-repo/prediction-api:latest
+```
+ 
+**2. Deploy to Cloud Run**
+ 
+```bash
+gcloud run deploy prediction-api \
+  --image us-central1-docker.pkg.dev/<PROJECT_ID>/hospital-repo/prediction-api:latest \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 8000
+```
+ 
+> Model artifacts (`model.pkl`, encoders, `params.yaml`) are baked into the container image at build time via the `Dockerfile` — no external volume mounts needed on Cloud Run.
+ 
+---
+
 ## Author
 
 **Ritam Rakshit** · [GitHub](https://github.com/RitamRixx) · [DagsHub](https://dagshub.com/RitamRixx)
