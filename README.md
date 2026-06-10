@@ -69,7 +69,7 @@ Infrastructure  Docker · Docker Compose
 │   │ _data        │    │              │    │  (always runs)       │ │
 │   └──────────────┘    └──────────────┘    └──────────────────────┘ │
 │          │                   │                                      │
-│   Pulls 10K records    Runs full ML                                 │
+│   Pulls 30k records    Runs full ML                                 │
 │   from REST API         pipeline                                    │
 └─────────────────────────────────────────────────────────────────────┘
           │                   │
@@ -98,7 +98,7 @@ Infrastructure  Docker · Docker Compose
 ```
 External REST API (Render)
         │
-        │  Sliding window — 10K records per weekly run
+        │  Sliding window — 30k records per weekly run
         ▼
 ETL Pipeline (extract → transform → load)
         │
@@ -399,7 +399,7 @@ The Airflow DAG `hospital_readmission_pipeline` runs **weekly** and executes thr
 fetch_new_data  ──▶  dvc_repro  ──▶  pipeline_summary
 ```
 
-- `fetch_new_data` — pulls the next 10K records from the external API using a sliding window offset stored in `data/etl_state/state.json`
+- `fetch_new_data` — pulls the next 30k records from the external API using a sliding window offset stored in `data/etl_state/state.json`
 - `dvc_repro` — runs the full DVC ML pipeline; DVC skips unchanged stages automatically
 - `pipeline_summary` — prints a run summary (offset, drift decision, deployment decision) regardless of upstream success/failure
 
